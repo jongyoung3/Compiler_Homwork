@@ -68,7 +68,7 @@ int main()
 void LR_Parser(char *input)
 {
     int ip = 0;        // Input pointer
-    int order_num = 1; // 파싱 순서
+    int order_num = 1; // 파싱 단계
     sp = -1;           // stack pointer 초기화
     push(0);           // stack의 초기상태 push
 
@@ -109,7 +109,7 @@ void LR_Parser(char *input)
             push(input[ip]);
             push(action);
 
-            printf("(%d) shift %d:  ", order_num, action);
+            printf("(%d) shift %d:  ", order_num, action); // (파싱 단계) (파서 동작) 출력
             order_num++;
 
             for (int i = 0; i <= sp; i++)
@@ -125,17 +125,17 @@ void LR_Parser(char *input)
                 case 69:  // 'E'
                 case 84:  // 'T'
                 case 70:  // 'F'
-                    printf("%c", stack[i]);
+                    printf("%c", stack[i]); // (스택 내용) 출력
                     break;
 
                 default:
-                    printf("%d", stack[i]);
+                    printf("%d", stack[i]); // (스택 내용) 출력
                     break;
                 }
             }
 
             ip++;
-            printf("  %s\n", input + ip);
+            printf("  %s\n", input + ip); // (입력열 내용) 출력
         }
         else if (action < 0)
         {
@@ -157,7 +157,7 @@ void LR_Parser(char *input)
             push(lhs[rule]);
             push(goTo);
 
-            printf("(%d) reduce %d: ", order_num, rule);
+            printf("(%d) reduce %d: ", order_num, rule); // (파싱 단계) (파서 동작) 출력
             order_num++;
 
             for (int i = 0; i <= sp; i++)
@@ -173,16 +173,16 @@ void LR_Parser(char *input)
                 case 69:  // 'E'
                 case 84:  // 'T'
                 case 70:  // 'F'
-                    printf("%c", stack[i]);
+                    printf("%c", stack[i]); // (스택 내용) 출력
                     break;
 
                 default:
-                    printf("%d", stack[i]);
+                    printf("%d", stack[i]); // (스택 내용) 출력
                     break;
                 }
             }
 
-            printf("  %s\n", input + ip);
+            printf("  %s\n", input + ip); // (입력열 내용) 출력
             // printf("  %d\n", stack[0]);
         }
         else if (action == 999)
@@ -202,11 +202,11 @@ void LR_Parser(char *input)
 
 int get_row(char c)
 {
-    for (int i = 1; i < 4; i++)
+    for (int i = 1; i < 4; i++) // goto_tbl에서 0번 인덱스 제외
     {
         if (NT[i] == c)
         {
-            return i; // goto_tbl에서 0번 인덱스 제외
+            return i; 
         }
     }
 
