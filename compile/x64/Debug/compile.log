@@ -1,0 +1,7 @@
+﻿  calc.c
+calc.c(1262,16): warning C4013: 'yylex'이(가) 정의되지 않았습니다. extern은 int형을 반환하는 것으로 간주합니다.
+calc.c(1446,7): warning C4013: 'yyerror'이(가) 정의되지 않았습니다. extern은 int형을 반환하는 것으로 간주합니다.
+  calclex.c
+  코드를 생성하고 있습니다...
+C:\Users\rla\Desktop\compile\calc.y(28): warning C4716: 'yyerror': 값을 반환해야 합니다.
+  compile.vcxproj -> C:\Users\rla\Desktop\compile\x64\Debug\compile.exe
