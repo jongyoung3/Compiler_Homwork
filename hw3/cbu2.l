@@ -26,8 +26,6 @@ char \'{id}\'
 %%
 int {return(INT);}
 정수 {return(INT);}
-float {return(FLOAT);}
-실수 {return(FLOAT);}
 char {return(CHAR);}
 문자 {return(CHAR);}
 {ws}	{/* do nothing */}
@@ -40,6 +38,8 @@ char {return(CHAR);}
 "*" {return(MUL);}
 디바이드 {return(DIV);}
 "/" {return(DIV);}
+나머지 {return(MOD);}
+"%" {return(MOD);}
 플러스플러스 {return(ADDONE);}
 "++" {return(ADDONE);}
 마이너스마이너스 {return(SUBONE);}

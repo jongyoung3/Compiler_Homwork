@@ -60,10 +60,11 @@ void	addstmt(int, int, int);
 void	substmt(int, int, int);
 void	mulstmt(int, int, int);
 void	divstmt(int, int, int);
+void	modstmt(int, int, int);
 int		insertsym(char *);
 %}
 
-%token	ADD SUB ASSIGN ID NUM FNUM STMTEND START END ID2 ID3 INT CHAR CHARVAL DIV MUL
+%token	ADD SUB ASSIGN ID NUM FNUM STMTEND START END ID2 ID3 INT CHAR CHARVAL DIV MUL MOD
 %token	ADDONE SUBONE PLUSASSIGN MINUSASSIGN MULASSIGN DIVASSIGN STRINGASSIGN STRINGARRAY PRINTSTRING STRINGNAME
 %token	OPENARRAY CLOSEARRAY  DEFARRAY ARRAYSIZE ARRAYNAME ARRAYNAME2 DEFARRAYNAME DEFSTRING
 %token	EQUAL NOTEQUAL GREAT LESS LESSEQUAL GREATEQUAL
@@ -82,7 +83,7 @@ stmt_list 	: 	stmt_list stmt 	{$$=MakeListTree($1, $2);}
 			;
 
 stmt	:	stmt_control
-		|	stmt_banbok
+		|	stmt_loop
 		|	stmt_decl
 		|	arraydef
 		|	string_print
@@ -96,7 +97,7 @@ stmt_eif_if :	IF STARTCONT bigyo_expr ENDCONT STARTSTMT stmt_list ENDSTMT {$$=Ma
 			;
 
 
-stmt_banbok : stmt_while
+stmt_loop : stmt_while
 			| stmt_for
 			;
 
@@ -194,6 +195,7 @@ sansul_expr	: 	sansul_expr ADD sansul_expr_two	{ $$=MakeOPTree(ADD, $1, $3); }
 
 sansul_expr_two :	sansul_expr_two MUL term 	{ $$=MakeOPTree(MUL, $1, $3); }
 				|	sansul_expr_two DIV term	{ $$=MakeOPTree(DIV, $1, $3); }
+				|	sansul_expr_two MOD term	{ $$=MakeOPTree(MOD, $1, $3); }
 				|	term 
 				;
 
@@ -206,8 +208,8 @@ term	:	NUM		{ /* NUM node is created in lex */ }
 %%
 int main(int argc, char *argv[]) 
 {
-	printf("\nHAYONG LANGUAGE COMPILER\n");
-	printf("(C) Copyright by Ha Yong Jeong (moonlighthouse99@gmail.com), 2023.\n");
+	printf("\nJONGYONG LANGUAGE COMPILER\n");
+	printf("(C) Copyright by Jongyoung Jeon (email : jongyong5645@gmail.com), 2024.\n");
 	
 	if (argc == 2)
 		yyin = fopen(argv[1], "r");
@@ -360,6 +362,9 @@ void prtcode(int token, int val)
 		break;
 	case DIV:
 		fprintf(fp, "/\n");
+		break;
+	case MOD:
+		fprintf(fp, "%%\n");
 		break;
 	case ADDONE:
 		fprintf(fp, "PUSH %d\n", one);
