@@ -22,12 +22,12 @@ id		{letter}({letter}|{digit})*
 %%
 {ws}	{/* do nothing */}
 {nl}	{lineno++; }
-´õÇÏ±â	{return(ADD); }
-»©±â		{return(SUB); }
+ë”í•˜ê¸°	{return(ADD); }
+ë¹¼ê¸°		{return(SUB); }
 :=		{return(ASSGN); }
 ;		{return(STMTEND); }
-½ÃÀÛ		{return(START); }
-³¡		{return(END); }
+ì‹œì‘		{return(START); }
+ë		{return(END); }
 {id}	{temp=insertsym(yytext); yylval=MakeNode(ID, temp); return(ID);}
 {digit}+		{sscanf(yytext, "%d", &temp); yylval=MakeNode(NUM, temp); return(NUM);}
 .		{printf("invalid token %s\n", yytext); }
