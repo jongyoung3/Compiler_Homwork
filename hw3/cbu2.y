@@ -60,11 +60,10 @@ void	addstmt(int, int, int);
 void	substmt(int, int, int);
 void	mulstmt(int, int, int);
 void	divstmt(int, int, int);
-void	modstmt(int, int, int);
 int		insertsym(char *);
 %}
 
-%token	ADD SUB ASSIGN ID NUM FNUM STMTEND START END ID2 ID3 INT CHAR CHARVAL DIV MUL MOD
+%token	ADD SUB ASSIGN ID NUM FNUM STMTEND START END ID2 ID3 INT CHAR CHARVAL DIV MUL
 %token	ADDONE SUBONE PLUSASSIGN MINUSASSIGN MULASSIGN DIVASSIGN STRINGASSIGN STRINGARRAY PRINTSTRING STRINGNAME
 %token	OPENARRAY CLOSEARRAY  DEFARRAY ARRAYSIZE ARRAYNAME ARRAYNAME2 DEFARRAYNAME DEFSTRING
 %token	EQUAL NOTEQUAL GREAT LESS LESSEQUAL GREATEQUAL
@@ -89,11 +88,11 @@ stmt	:	stmt_control
 		|	string_print
 		;
 
-stmt_control	: IF STARTCONT bigyo_expr ENDCONT STARTSTMT stmt_list ENDSTMT {$$=MakeOPTree(IF,$3,$6);}
+stmt_control	: IF STARTCONT compare_expr ENDCONT STARTSTMT stmt_list ENDSTMT {$$=MakeOPTree(IF,$3,$6);}
 				| stmt_eif_if ELSE STARTSTMT stmt_list ENDSTMT  {$$=MakeOPTree(IF,$1,$4);}
 				;
 				
-stmt_eif_if :	IF STARTCONT bigyo_expr ENDCONT STARTSTMT stmt_list ENDSTMT {$$=MakeOPTree(IFELSE,$3,$6);}
+stmt_eif_if :	IF STARTCONT compare_expr ENDCONT STARTSTMT stmt_list ENDSTMT {$$=MakeOPTree(IFELSE,$3,$6);}
 			;
 
 
@@ -109,13 +108,13 @@ stmt_while		:	 loopstart loopstmt {$$=MakeOPTree(WHILESTMT,$1,$2);}
 loopstart	:	WHILE {$$=MakeNode(LOOPSTART,NULL);}
 			;
 
-loopstmt 	:	STARTCONT bigyo_expr ENDCONT STARTSTMT stmt_list ENDSTMT {$$=MakeOPTree(LOOPSTMT,$2,$5);}
+loopstmt 	:	STARTCONT compare_expr ENDCONT STARTSTMT stmt_list ENDSTMT {$$=MakeOPTree(LOOPSTMT,$2,$5);}
 			;
 
 stmt_for	:  for_start for_loopstmt {$$=MakeOPTree(FORSTMT,$1,$2);}
 			;
 
-for_start : for_init  bigyo_expr STMTEND {$$=MakeOPTree(FORSTART,$1,$2);}
+for_start : for_init  compare_expr STMTEND {$$=MakeOPTree(FORSTART,$1,$2);}
 		  ;
 
 for_init : for_loop_start STARTCONT stmt_decl { $$=MakeOPTree(FORINITSTMT,$3,$1);}
@@ -127,19 +126,19 @@ for_loop_start : FOR {$$=MakeNode(LOOPSTART,NULL);}
 for_loopstmt : stmt_decl ENDCONT STARTSTMT stmt_list ENDSTMT {$$=MakeOPTree(LOOPSTMT,$4,$1);}
 			 ;
 
-stmt_decl	:	type ID ASSIGN sansul_expr STMTEND { $2->token = ID2; $$=MakeOPTree(ASSIGN, $2, $4);}
-			|	type ID PLUSASSIGN sansul_expr STMTEND { $2->token = ID3; $$=MakeOPTree(PLUSASSIGN, $2, $4);}
-			|	type ID MINUSASSIGN sansul_expr STMTEND { $2->token = ID3; $$=MakeOPTree(MINUSASSIGN, $2, $4);}
-			|	type ID MULASSIGN sansul_expr STMTEND { $2->token = ID3; $$=MakeOPTree(MULASSIGN, $2, $4);}
-			|	type ID DIVASSIGN sansul_expr STMTEND { $2->token = ID3; $$=MakeOPTree(DIVASSIGN, $2, $4);}
-			|	ID ASSIGN sansul_expr STMTEND	{ $1->token = ID2; $$=MakeOPTree(ASSIGN, $1, $3);}
-			|	ID PLUSASSIGN sansul_expr STMTEND {$1->token = ID3; $$=MakeOPTree(PLUSASSIGN, $1, $3);}
-			|	ID MINUSASSIGN sansul_expr STMTEND {$1->token = ID3; $$=MakeOPTree(MINUSASSIGN, $1, $3);}
-			|	ID MULASSIGN sansul_expr STMTEND {$1->token = ID3; $$=MakeOPTree(MULASSIGN, $1, $3);}
-			|	ID DIVASSIGN sansul_expr STMTEND {$1->token = ID3; $$=MakeOPTree(DIVASSIGN, $1, $3);}
-			|	arrayassign2 ASSIGN sansul_expr STMTEND{$$=MakeOPTree(ASSIGN,$1,$3);}
-			|	onepm_expr
-			|	bigyo_expr
+stmt_decl	:	type ID ASSIGN calculation_expr STMTEND { $2->token = ID2; $$=MakeOPTree(ASSIGN, $2, $4);}
+			|	type ID PLUSASSIGN calculation_expr STMTEND { $2->token = ID3; $$=MakeOPTree(PLUSASSIGN, $2, $4);}
+			|	type ID MINUSASSIGN calculation_expr STMTEND { $2->token = ID3; $$=MakeOPTree(MINUSASSIGN, $2, $4);}
+			|	type ID MULASSIGN calculation_expr STMTEND { $2->token = ID3; $$=MakeOPTree(MULASSIGN, $2, $4);}
+			|	type ID DIVASSIGN calculation_expr STMTEND { $2->token = ID3; $$=MakeOPTree(DIVASSIGN, $2, $4);}
+			|	ID ASSIGN calculation_expr STMTEND	{ $1->token = ID2; $$=MakeOPTree(ASSIGN, $1, $3);}
+			|	ID PLUSASSIGN calculation_expr STMTEND {$1->token = ID3; $$=MakeOPTree(PLUSASSIGN, $1, $3);}
+			|	ID MINUSASSIGN calculation_expr STMTEND {$1->token = ID3; $$=MakeOPTree(MINUSASSIGN, $1, $3);}
+			|	ID MULASSIGN calculation_expr STMTEND {$1->token = ID3; $$=MakeOPTree(MULASSIGN, $1, $3);}
+			|	ID DIVASSIGN calculation_expr STMTEND {$1->token = ID3; $$=MakeOPTree(DIVASSIGN, $1, $3);}
+			|	arrayassign2 ASSIGN calculation_expr STMTEND{$$=MakeOPTree(ASSIGN,$1,$3);}
+			|	onecalc_expr
+			|	compare_expr
 			;
 
 
@@ -175,27 +174,26 @@ arrayassign2	:	ID OPENARRAY NUM CLOSEARRAY {$1->token = ARRAYNAME; $$=MakeOPTree
 string_print	:	PRINTSTRING STARTCONT ID ENDCONT STMTEND {$3->token = STRINGNAME; $$=MakeOPTree(PRINTSTRING,$3,NULL);}
 				;
 
-onepm_expr	: ID ADDONE STMTEND {$1->token = ID3; $$=MakeOPTree(ADDONE,$1,NULL);}
+onecalc_expr	: ID ADDONE STMTEND {$1->token = ID3; $$=MakeOPTree(ADDONE,$1,NULL);}
 			| ID SUBONE STMTEND {$1->token = ID3; $$=MakeOPTree(SUBONE,$1,NULL);}
 			;			
 
-bigyo_expr	: bigyo_expr EQUAL sansul_expr {$$=MakeOPTree(EQUAL,$1,$3);}
-			| bigyo_expr NOTEQUAL sansul_expr {$$=MakeOPTree(NOTEQUAL,$1,$3);}
-			| bigyo_expr GREAT sansul_expr {$$=MakeOPTree(GREAT,$1,$3);}
-			| bigyo_expr LESS sansul_expr {$$=MakeOPTree(LESS,$1,$3);}
-			| bigyo_expr GREATEQUAL sansul_expr {$$=MakeOPTree(GREATEQUAL,$1,$3);}
-			| bigyo_expr LESSEQUAL sansul_expr {$$=MakeOPTree(LESSEQUAL,$1,$3);}
-			| sansul_expr
+compare_expr	: compare_expr EQUAL calculation_expr {$$=MakeOPTree(EQUAL,$1,$3);}
+			| compare_expr NOTEQUAL calculation_expr {$$=MakeOPTree(NOTEQUAL,$1,$3);}
+			| compare_expr GREAT calculation_expr {$$=MakeOPTree(GREAT,$1,$3);}
+			| compare_expr LESS calculation_expr {$$=MakeOPTree(LESS,$1,$3);}
+			| compare_expr GREATEQUAL calculation_expr {$$=MakeOPTree(GREATEQUAL,$1,$3);}
+			| compare_expr LESSEQUAL calculation_expr {$$=MakeOPTree(LESSEQUAL,$1,$3);}
+			| calculation_expr
 			;			
 
-sansul_expr	: 	sansul_expr ADD sansul_expr_two	{ $$=MakeOPTree(ADD, $1, $3); }
-			|	sansul_expr SUB sansul_expr_two	{ $$=MakeOPTree(SUB, $1, $3); }
-			|	sansul_expr_two
+calculation_expr	: 	calculation_expr ADD calculation_expr_two	{ $$=MakeOPTree(ADD, $1, $3); }
+			|	calculation_expr SUB calculation_expr_two	{ $$=MakeOPTree(SUB, $1, $3); }
+			|	calculation_expr_two
 			;
 
-sansul_expr_two :	sansul_expr_two MUL term 	{ $$=MakeOPTree(MUL, $1, $3); }
-				|	sansul_expr_two DIV term	{ $$=MakeOPTree(DIV, $1, $3); }
-				|	sansul_expr_two MOD term	{ $$=MakeOPTree(MOD, $1, $3); }
+calculation_expr_two :	calculation_expr_two MUL term 	{ $$=MakeOPTree(MUL, $1, $3); }
+				|	calculation_expr_two DIV term	{ $$=MakeOPTree(DIV, $1, $3); }
 				|	term 
 				;
 
@@ -362,9 +360,6 @@ void prtcode(int token, int val)
 		break;
 	case DIV:
 		fprintf(fp, "/\n");
-		break;
-	case MOD:
-		fprintf(fp, "%%\n");
 		break;
 	case ADDONE:
 		fprintf(fp, "PUSH %d\n", one);
