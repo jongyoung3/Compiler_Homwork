@@ -65,9 +65,9 @@ int		insertsym(char *);
 
 %token	ADD SUB ASSIGN ID NUM FNUM STMTEND START END ID2 ID3 INT CHAR CHARVAL DIV MUL
 %token	ADDONE SUBONE PLUSASSIGN MINUSASSIGN MULASSIGN DIVASSIGN STRINGASSIGN STRINGARRAY PRINTSTRING STRINGNAME
-%token	OPENARRAY CLOSEARRAY  DEFARRAY ARRAYSIZE ARRAYNAME ARRAYNAME2 DEFARRAYNAME DEFSTRING
+%token	LEFTSBKT RIGHTSBKT  DEFARRAY ARRAYSIZE ARRAYNAME ARRAYNAME2 DEFARRAYNAME DEFSTRING
 %token	EQUAL NOTEQUAL GREAT LESS LESSEQUAL GREATEQUAL
-%token	IF ELSE STARTSTMT ENDSTMT STARTCONT ENDCONT WHILE EIF IFELSE LOOPSTART LOOPSTMT WHILESTMT
+%token	IF ELSE LEFTBRACE RIGHTBRACE LEFTPTH RIGHTPTH WHILE EIF IFELSE LOOPSTART LOOPSTMT WHILESTMT
 %token FOR FORSTART FORINITSTMT FORSTMT 
  
 
@@ -88,11 +88,11 @@ stmt	:	stmt_control
 		|	string_print
 		;
 
-stmt_control	: IF STARTCONT compare_expr ENDCONT STARTSTMT stmt_list ENDSTMT {$$=MakeOPTree(IF,$3,$6);}
-				| stmt_eif_if ELSE STARTSTMT stmt_list ENDSTMT  {$$=MakeOPTree(IF,$1,$4);}
+stmt_control	: IF LEFTPTH compare_expr RIGHTPTH LEFTBRACE stmt_list RIGHTBRACE {$$=MakeOPTree(IF,$3,$6);}
+				| stmt_eif_if ELSE LEFTBRACE stmt_list RIGHTBRACE  {$$=MakeOPTree(IF,$1,$4);}
 				;
 				
-stmt_eif_if :	IF STARTCONT compare_expr ENDCONT STARTSTMT stmt_list ENDSTMT {$$=MakeOPTree(IFELSE,$3,$6);}
+stmt_eif_if :	IF LEFTPTH compare_expr RIGHTPTH LEFTBRACE stmt_list RIGHTBRACE {$$=MakeOPTree(IFELSE,$3,$6);}
 			;
 
 
@@ -108,7 +108,7 @@ stmt_while		:	 loopstart loopstmt {$$=MakeOPTree(WHILESTMT,$1,$2);}
 loopstart	:	WHILE {$$=MakeNode(LOOPSTART,NULL);}
 			;
 
-loopstmt 	:	STARTCONT compare_expr ENDCONT STARTSTMT stmt_list ENDSTMT {$$=MakeOPTree(LOOPSTMT,$2,$5);}
+loopstmt 	:	LEFTPTH compare_expr RIGHTPTH LEFTBRACE stmt_list RIGHTBRACE {$$=MakeOPTree(LOOPSTMT,$2,$5);}
 			;
 
 stmt_for	:  for_start for_loopstmt {$$=MakeOPTree(FORSTMT,$1,$2);}
@@ -117,13 +117,13 @@ stmt_for	:  for_start for_loopstmt {$$=MakeOPTree(FORSTMT,$1,$2);}
 for_start : for_init  compare_expr STMTEND {$$=MakeOPTree(FORSTART,$1,$2);}
 		  ;
 
-for_init : for_loop_start STARTCONT stmt_decl { $$=MakeOPTree(FORINITSTMT,$3,$1);}
+for_init : for_loop_start LEFTPTH stmt_decl { $$=MakeOPTree(FORINITSTMT,$3,$1);}
 		 ;
 
 for_loop_start : FOR {$$=MakeNode(LOOPSTART,NULL);}
 			   ;
 
-for_loopstmt : stmt_decl ENDCONT STARTSTMT stmt_list ENDSTMT {$$=MakeOPTree(LOOPSTMT,$4,$1);}
+for_loopstmt : stmt_decl RIGHTPTH LEFTBRACE stmt_list RIGHTBRACE {$$=MakeOPTree(LOOPSTMT,$4,$1);}
 			 ;
 
 stmt_decl	:	type ID ASSIGN calculation_expr STMTEND { $2->token = ID2; $$=MakeOPTree(ASSIGN, $2, $4);}
@@ -142,17 +142,17 @@ stmt_decl	:	type ID ASSIGN calculation_expr STMTEND { $2->token = ID2; $$=MakeOP
 			;
 
 
-arraydef : intarraydef
-		 | stringdef
+arraydef : intarraydefinition
+		 | stringdefinition
 		 ;
 
-intarraydef	:	type ID OPENARRAY NUM CLOSEARRAY STMTEND {$2->token = DEFARRAYNAME; $4->token = ARRAYSIZE; $$=MakeOPTree(DEFARRAY,$2,$4);}
+intarraydefinition	:	type ID LEFTSBKT NUM RIGHTSBKT STMTEND {$2->token = DEFARRAYNAME; $4->token = ARRAYSIZE; $$=MakeOPTree(DEFARRAY,$2,$4);}
 			;
 
-stringdef	: string_name string_value {$$=MakeOPTree(DEFSTRING,$1,$2);}
+stringdefinition	: string_name string_value {$$=MakeOPTree(DEFSTRING,$1,$2);}
 			;
 
-string_name	: 	type  OPENARRAY NUM CLOSEARRAY ID { $3->token = ARRAYSIZE; $5->token = DEFARRAYNAME; $$=MakeOPTree(DEFARRAY,$5,$3);}
+string_name	: 	type  LEFTSBKT NUM RIGHTSBKT ID { $3->token = ARRAYSIZE; $5->token = DEFARRAYNAME; $$=MakeOPTree(DEFARRAY,$5,$3);}
 			;
 
 string_value	:	ASSIGN CHARVAL STMTEND {$$=MakeOPTree(STRINGASSIGN,$2,NULL);}
@@ -162,16 +162,16 @@ type	:	INT
 		|	CHAR
 		;
 
-arrayassign		:	ID OPENARRAY NUM CLOSEARRAY {$1->token = ARRAYNAME2; $$=MakeOPTree(ADD,$1,$3);}
-				|	ID OPENARRAY ID CLOSEARRAY {$1->token = ARRAYNAME;  $$=MakeOPTree(ADD,$1,$3);}
+arrayassign		:	ID LEFTSBKT NUM RIGHTSBKT {$1->token = ARRAYNAME2; $$=MakeOPTree(ADD,$1,$3);}
+				|	ID LEFTSBKT ID RIGHTSBKT {$1->token = ARRAYNAME;  $$=MakeOPTree(ADD,$1,$3);}
 				;
 
 
-arrayassign2	:	ID OPENARRAY NUM CLOSEARRAY {$1->token = ARRAYNAME; $$=MakeOPTree(ADD,$1,$3);}
-				|	ID OPENARRAY ID CLOSEARRAY {$1->token = ARRAYNAME;  $$=MakeOPTree(ADD,$1,$3);}
+arrayassign2	:	ID LEFTSBKT NUM RIGHTSBKT {$1->token = ARRAYNAME; $$=MakeOPTree(ADD,$1,$3);}
+				|	ID LEFTSBKT ID RIGHTSBKT {$1->token = ARRAYNAME;  $$=MakeOPTree(ADD,$1,$3);}
 				;
 
-string_print	:	PRINTSTRING STARTCONT ID ENDCONT STMTEND {$3->token = STRINGNAME; $$=MakeOPTree(PRINTSTRING,$3,NULL);}
+string_print	:	PRINTSTRING LEFTPTH ID RIGHTPTH STMTEND {$3->token = STRINGNAME; $$=MakeOPTree(PRINTSTRING,$3,NULL);}
 				;
 
 onecalc_expr	: ID ADDONE STMTEND {$1->token = ID3; $$=MakeOPTree(ADDONE,$1,NULL);}

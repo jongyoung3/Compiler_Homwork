@@ -108,10 +108,10 @@ if {return(IF);}
 else {return(ELSE);}
 さもなければ {return(ELSE);}
 否则 {return(ELSE);}
-"(" {return(STARTCONT);}
-")" {return(ENDCONT);}
-"{" {return(STARTSTMT);}
-"}" {return(ENDSTMT);}
+"(" {return(LEFTPTH);}
+")" {return(RIGHTPTH);}
+"{" {return(LEFTBRACE);}
+"}" {return(RIGHTBRACE);}
 와일반복 {return(WHILE);}
 while {return(WHILE);}
 同時に {return(WHILE);}
@@ -120,8 +120,8 @@ while {return(WHILE);}
 for {return(FOR);}
 のために {return(FOR);}
 对于 {return(FOR);}
-"[" {return(OPENARRAY);}
-"]" {return(CLOSEARRAY);}
+"[" {return(LEFTSBKT);}
+"]" {return(RIGHTSBKT);}
 printstring {return(PRINTSTRING);}
 "=" {return(ASSIGN);}
 :=		{return(ASSIGN); }
