@@ -23,9 +23,7 @@ typedef struct nodeType {
 	
 int tsymbolcnt=0;
 int errorcnt=0;
-int looplabel = 0;
 int label = 0;
-int loop = 0;
 int one = 1;
 int ifcount = 0;
 int arraysize;
@@ -67,8 +65,7 @@ int		insertsym(char *);
 %token	ADDONE SUBONE PLUSASSIGN MINUSASSIGN MULASSIGN DIVASSIGN STRINGASSIGN STRINGARRAY PRINTSTRING STRINGNAME
 %token	LEFTSBKT RIGHTSBKT  DEFARRAY ARRAYSIZE ARRAYNAME ARRAYNAME2 DEFARRAYNAME DEFSTRING
 %token	EQUAL NOTEQUAL GREAT LESS LESSEQUAL GREATEQUAL
-%token	IF ELSE LEFTBRACE RIGHTBRACE LEFTPTH RIGHTPTH WHILE EIF IFELSE LOOPSTART LOOPSTMT WHILESTMT
-%token FOR FORSTART FORINITSTMT FORSTMT 
+%token	IF ELSE LEFTBRACE RIGHTBRACE LEFTPTH RIGHTPTH EIF IFELSE
  
 
 
@@ -82,7 +79,6 @@ stmt_list 	: 	stmt_list stmt 	{$$=MakeListTree($1, $2);}
 			;
 
 stmt	:	stmt_control
-		|	stmt_loop
 		|	stmt_decl
 		|	arraydef
 		|	string_print
@@ -94,37 +90,6 @@ stmt_control	: IF LEFTPTH compare_expr RIGHTPTH LEFTBRACE stmt_list RIGHTBRACE {
 				
 stmt_eif_if :	IF LEFTPTH compare_expr RIGHTPTH LEFTBRACE stmt_list RIGHTBRACE {$$=MakeOPTree(IFELSE,$3,$6);}
 			;
-
-
-stmt_loop : stmt_while
-			| stmt_for
-			;
-
-
-stmt_while		:	 loopstart loopstmt {$$=MakeOPTree(WHILESTMT,$1,$2);}	
-				;	
-
-
-loopstart	:	WHILE {$$=MakeNode(LOOPSTART,NULL);}
-			;
-
-loopstmt 	:	LEFTPTH compare_expr RIGHTPTH LEFTBRACE stmt_list RIGHTBRACE {$$=MakeOPTree(LOOPSTMT,$2,$5);}
-			;
-
-stmt_for	:  for_start for_loopstmt {$$=MakeOPTree(FORSTMT,$1,$2);}
-			;
-
-for_start : for_init  compare_expr STMTEND {$$=MakeOPTree(FORSTART,$1,$2);}
-		  ;
-
-for_init : for_loop_start LEFTPTH stmt_decl { $$=MakeOPTree(FORINITSTMT,$3,$1);}
-		 ;
-
-for_loop_start : FOR {$$=MakeNode(LOOPSTART,NULL);}
-			   ;
-
-for_loopstmt : stmt_decl RIGHTPTH LEFTBRACE stmt_list RIGHTBRACE {$$=MakeOPTree(LOOPSTMT,$4,$1);}
-			 ;
 
 stmt_decl	:	type ID ASSIGN calculation_expr STMTEND { $2->token = ID2; $$=MakeOPTree(ASSIGN, $2, $4);}
 			|	type ID PLUSASSIGN calculation_expr STMTEND { $2->token = ID3; $$=MakeOPTree(PLUSASSIGN, $2, $4);}
@@ -439,23 +404,6 @@ void prtcode(int token, int val)
 		}
 		break;
 	case IFELSE:
-		if(labelout == -1)
-		{
-			fprintf(fp,"LABEL labelout%d\n",labeloutnum);
-			labeloutnum++;
-		}
-		else
-		{
-			fprintf(fp,"LABEL label%d\n",label);
-			label++;
-		}
-		break;
-	case LOOPSTART:
-		fprintf(fp,"LABEL loop%d\n",looplabel);
-		break;
-	case LOOPSTMT:
-		fprintf(fp,"GOTO loop%d\n",looplabel);
-		looplabel++;
 		if(labelout == -1)
 		{
 			fprintf(fp,"LABEL labelout%d\n",labeloutnum);

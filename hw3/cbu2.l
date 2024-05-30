@@ -112,14 +112,6 @@ else {return(ELSE);}
 ")" {return(RIGHTPTH);}
 "{" {return(LEFTBRACE);}
 "}" {return(RIGHTBRACE);}
-와일반복 {return(WHILE);}
-while {return(WHILE);}
-同時に {return(WHILE);}
-虽然 {return(WHILE);}
-포반복 {return(FOR);}
-for {return(FOR);}
-のために {return(FOR);}
-对于 {return(FOR);}
 "[" {return(LEFTSBKT);}
 "]" {return(RIGHTSBKT);}
 printstring {return(PRINTSTRING);}
